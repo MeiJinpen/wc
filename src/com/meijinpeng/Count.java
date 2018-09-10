@@ -13,6 +13,8 @@ public class Count {
     int blankLineCount;
     int commentLineCount;
 
+    boolean isFuzzyQuery;
+
     /**
      * 默认都为-1，当参数选择计算哪个时再置0
      */
@@ -23,5 +25,6 @@ public class Count {
         codeLineCount = -1;
         blankLineCount = -1;
         commentLineCount = -1;
+        isFuzzyQuery = false;
     }
 }

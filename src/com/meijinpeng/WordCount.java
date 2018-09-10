@@ -67,6 +67,10 @@ public class WordCount {
      */
     public void count(String fileName, Callback<Count> countCallback, String... strs) {
         Count count = checkParams(strs);
+        if(count.isFuzzyQuery) {
+            // todo:模糊查询目录下的匹配的文件名
+            return;
+        }
         File file = new File(fileName);
         if(!file.exists()) {
             countCallback.onError("文件不存在，请重试");
@@ -79,17 +83,14 @@ public class WordCount {
             reader = new BufferedReader(fileReader);
             String line;
             while ( null != (line = reader.readLine())){
-                if(count.lineCount != -1) {
+                if(isUsed(count.lineCount))
                     count.lineCount = count.lineCount + addLineCount();
-                }
-                if(count.wordCount != -1) {
+                if(isUsed(count.wordCount))
                     count.wordCount = count.wordCount + getWorkCount(line);
-                }
-                if(count.charCount != -1) {
+                if(isUsed(count.charCount))
                     count.charCount = count.charCount + getCharCount(line);
-                }
-                if(count.codeLineCount != -1 && count.blankLineCount != -1
-                        && count.commentLineCount != -1) {
+                if(isUsed(count.codeLineCount) && isUsed(count.blankLineCount)
+                        && isUsed(count.commentLineCount)) {
                     count.codeLineCount = count.codeLineCount + addCodeLine(line);
                     count.blankLineCount = count.blankLineCount + addBlankLine(line);
                     count.commentLineCount = count.commentLineCount + addCommentLine(line);
@@ -99,22 +100,7 @@ public class WordCount {
         } catch (IOException e) {
             countCallback.onError("文件读取出错，请重试");
         } finally {
-            closeIOs(fileReader, reader);
-        }
-    }
-
-    /**
-     * 关闭IO流
-     */
-    private void closeIOs(Closeable... closeables) {
-        for (Closeable closeable:closeables) {
-            if(closeable != null) {
-                try {
-                    closeable.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            Util.closeIOs(fileReader, reader);
         }
     }
 
@@ -140,9 +126,16 @@ public class WordCount {
                     count.codeLineCount = 0;
                     count.commentLineCount = 0;
                     break;
+                case Constant.MULTI_FILE_COUNT:
+                    count.isFuzzyQuery = true;
+                    break;
             }
         }
         return count;
+    }
+
+    public boolean isUsed(int arg) {
+        return arg != -1;
     }
 
     public interface Callback<T> {

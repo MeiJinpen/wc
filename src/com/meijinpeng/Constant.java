@@ -10,5 +10,5 @@ public class Constant {
     public static final String COUNT_WORD = "-w";
     public static final String COUNT_LINE = "-l";
     public static final String COUNT_COMPLEX_LINE = "-a";
-    public static final String RECURSIVE = "-s";
+    public static final String MULTI_FILE_COUNT = "-s";
 }
