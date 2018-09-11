@@ -14,9 +14,13 @@ public class WordCount {
     private static Executor executor = Executors.newFixedThreadPool(3);
 
     /**
-     * 统计一行中有多少字符
+     * 统计一行中有多少字符sss
      */
     private int getCharCount(String line) {
+        //空行算一个字符：“\n”
+        if(line.isEmpty()) {
+            return 1;
+        }
         return line.length();
     }
 
@@ -32,7 +36,10 @@ public class WordCount {
         line = line.trim();
         //用空格分隔单词
         String[] words = line.split("[\\s+,.]");
-        System.out.println(Arrays.toString(words));
+        //如果为空行，则返回0
+        if(words[0].equals("")) {
+            return 0;
+        }
         return words.length;
     }
 
@@ -47,14 +54,20 @@ public class WordCount {
      * 判断是否是代码行，是则返回1
      */
     private int addCodeLine(String line) {
+        if(addBlankLine(line) == 0 && addCommentLine(line) == 0) {
+            return 1;
+        }
         return 0;
     }
 
     /**
-     * 判断是否是空白行，是则返回1
+     * 判断是否是空白行，如果包括代码，则只有不超过一个可显示的字符，例如“{”。
      */
     private int addBlankLine(String line) {
-
+        if(line.isEmpty()) return 1;
+        if(!line.matches("[a-zA-Z]") && (line.trim().equals("{") || line.trim().equals("}"))) {
+            return 1;
+        }
         return 0;
     }
 
@@ -62,7 +75,15 @@ public class WordCount {
      * 判断是否是注释行，是则返回1
      */
     private int addCommentLine(String line) {
-
+        line = line.trim();
+        //匹配“//”单行注释或“} //”情况
+        if(line.matches("}*\\s+//?.+")) {
+            return 1;
+        }
+        //匹配“/**/”和“/** * */”的情况
+        if(line.matches("((//?.+)|(/\\*+)|((^\\s)*\\*.+)|((^\\s)*\\*)|((^\\s)*\\*/))+")) {
+            return 1;
+        }
         return 0;
     }
 
