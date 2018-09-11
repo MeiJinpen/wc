@@ -1,6 +1,7 @@
 package com.meijinpeng;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -16,16 +17,23 @@ public class WordCount {
      * 统计一行中有多少字符
      */
     private int getCharCount(String line) {
-
-        return 0;
+        return line.length();
     }
 
     /**
      * 统计一行中有多少单词
      */
     private int getWorkCount(String line) {
-
-        return 0;
+        //把所有除了字母以外的字符都去掉
+        line = line.replaceAll("[^a-zA-Z]", " ");
+        //把多于两个以上的空格全部转化为一个空格
+        line = line.replaceAll("\\s+"," ");
+        //去掉首部和尾随的空格
+        line = line.trim();
+        //用空格分隔单词
+        String[] words = line.split("[\\s+,.]");
+        System.out.println(Arrays.toString(words));
+        return words.length;
     }
 
     /**
@@ -39,7 +47,6 @@ public class WordCount {
      * 判断是否是代码行，是则返回1
      */
     private int addCodeLine(String line) {
-
         return 0;
     }
 

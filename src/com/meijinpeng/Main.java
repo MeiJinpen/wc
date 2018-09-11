@@ -1,6 +1,6 @@
 package com.meijinpeng;
 
-public class App {
+public class Main {
 
     /**
      * 程序入口
