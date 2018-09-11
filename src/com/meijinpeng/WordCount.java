@@ -1,8 +1,10 @@
 package com.meijinpeng;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.concurrent.Executor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -10,11 +12,17 @@ import java.util.concurrent.Executors;
  */
 public class WordCount {
 
+    boolean isFuzzyQuery;
+    boolean isCountChar;
+    boolean isCountWord;
+    boolean isCountLine;
+    boolean isCountComplexLine;
+
     //创建线程池，并发任务
-    private static Executor executor = Executors.newFixedThreadPool(3);
+    public ExecutorService executor = Executors.newFixedThreadPool(3);
 
     /**
-     * 统计一行中有多少字符sss
+     * 统计一行中有多少字符
      */
     private int getCharCount(String line) {
         //空行算一个字符：“\n”
@@ -90,15 +98,50 @@ public class WordCount {
     /**
      * 统计文件的字符数、单词数和行数等
      * @param fileName 文件名
-     * @param countCallback 回调接口
      * @param strs 参数数组
      */
-    public void count(String fileName, Callback<Count> countCallback, String... strs) {
-        Count count = checkParams(strs);
-        if(count.isFuzzyQuery) {
-            // todo:模糊查询目录下的匹配的文件名
-            return;
+    public void count(String fileName,  String... strs) {
+        checkParams(strs);
+        if(isFuzzyQuery) {
+            //递归处理文件
+            countMultiFile(fileName);
+        } else {
+            //处理单文件
+            countSingleFile(fileName, new CountResult(this));
         }
+    }
+
+    /**
+     * 并发统计多文件
+     * @param fileName
+     */
+    private void countMultiFile(String fileName) {
+//        final CountDownLatch countDownLatch = new CountDownLatch(3);
+
+        File directory = new File("");  //设定为当前文件夹
+        List<String> files = new ArrayList<>();
+        FileUtil.findFiles(directory.getAbsolutePath(), fileName, files);
+        //得到文件集合后，并发处理，提高效率
+        for (String name: files) {
+            executor.execute(() -> {
+                WordCount.this.countSingleFile(name, new CountResult(this));
+//                countDownLatch.countDown();
+            });
+        }
+//        try {
+//            countDownLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    /**
+     * 统计单文件
+     * @param fileName
+     * @param countCallback
+     */
+    private void countSingleFile(String fileName, Callback countCallback) {
+        Count count = new Count();
         File file = new File(fileName);
         if(!file.exists()) {
             countCallback.onError("文件不存在，请重试");
@@ -111,63 +154,55 @@ public class WordCount {
             reader = new BufferedReader(fileReader);
             String line;
             while ( null != (line = reader.readLine())){
-                if(isUsed(count.lineCount))
+                if(isCountLine)
                     count.lineCount = count.lineCount + addLineCount();
-                if(isUsed(count.wordCount))
+                if(isCountWord)
                     count.wordCount = count.wordCount + getWorkCount(line);
-                if(isUsed(count.charCount))
+                if(isCountChar)
                     count.charCount = count.charCount + getCharCount(line);
-                if(isUsed(count.codeLineCount) && isUsed(count.blankLineCount)
-                        && isUsed(count.commentLineCount)) {
+                if(isCountComplexLine) {
                     count.codeLineCount = count.codeLineCount + addCodeLine(line);
                     count.blankLineCount = count.blankLineCount + addBlankLine(line);
                     count.commentLineCount = count.commentLineCount + addCommentLine(line);
                 }
             }
-            countCallback.onSuccess(count);
+            countCallback.onSuccess(count, fileName);
         } catch (IOException e) {
             countCallback.onError("文件读取出错，请重试");
         } finally {
-            Util.closeIOs(fileReader, reader);
+            FileUtil.closeIOs(fileReader, reader);
         }
     }
 
     /**
      * 检查参数选择
      */
-    private Count checkParams(String... strs) {
-        Count count = new Count();
-        if(strs == null || strs.length == 0) return count;
+    private void checkParams(String... strs) {
         for (String str: strs) {
             switch (str) {
                 case Constant.COUNT_CHAR:
-                    count.charCount = 0;
+                    isCountChar = true;
                     break;
                 case Constant.COUNT_WORD:
-                    count.wordCount = 0;
+                    isCountWord = true;
                     break;
                 case Constant.COUNT_LINE:
-                    count.lineCount = 0;
+                    isCountLine = true;
                     break;
                 case Constant.COUNT_COMPLEX_LINE:
-                    count.blankLineCount = 0;
-                    count.codeLineCount = 0;
-                    count.commentLineCount = 0;
+                    isCountComplexLine = true;
                     break;
                 case Constant.MULTI_FILE_COUNT:
-                    count.isFuzzyQuery = true;
+                    isFuzzyQuery = true;
                     break;
             }
         }
-        return count;
     }
 
-    public boolean isUsed(int arg) {
-        return arg != -1;
-    }
 
-    public interface Callback<T> {
+
+    public interface Callback {
         void onError(String msg);
-        void onSuccess(T count);
+        void onSuccess(Count count, String fileName);
     }
 }
