@@ -3,9 +3,9 @@ package com.meijinpeng;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 统计字符数、单词数和行数等
@@ -116,23 +116,27 @@ public class WordCount {
      * @param fileName
      */
     private void countMultiFile(String fileName) {
-//        final CountDownLatch countDownLatch = new CountDownLatch(3);
-
         File directory = new File("");  //设定为当前文件夹
         List<String> files = new ArrayList<>();
         FileUtil.findFiles(directory.getAbsolutePath(), fileName, files);
         //得到文件集合后，并发处理，提高效率
-        for (String name: files) {
-            executor.execute(() -> {
-                WordCount.this.countSingleFile(name, new CountResult(this));
-//                countDownLatch.countDown();
-            });
+        if(files.size() == 0) {
+            System.out.println("无法匹配到适合的文件");
+            return;
         }
-//        try {
-//            countDownLatch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        for (String name: files) {
+            executor.execute(() -> countSingleFile(name, new CountResult(this)));
+        }
+        //开启线程池执行任务后，关闭线程池释放资源
+        executor.shutdown();
+        try {
+            boolean loop = true;
+            while (loop) {
+                loop = !executor.awaitTermination(2, TimeUnit.SECONDS);  //超时等待阻塞，直到线程池里所有任务结束
+            } //等待所有任务完成
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -40,7 +40,7 @@ public class FileUtil {
                     tempName = readFile.getName();
                     if (wildcardMatch(fileName, tempName)) {
                         //匹配成功，将文件名添加到文件列表中
-                        files.add(readFile.getAbsoluteFile().getName());
+                        files.add(readFile.getAbsoluteFile().getAbsolutePath());
                     }
                 } else if (readFile.isDirectory()) {
                     findFiles(dirName + "\\" + s, fileName, files);

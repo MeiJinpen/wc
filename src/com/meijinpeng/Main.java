@@ -10,10 +10,8 @@ public class Main {
         WordCount wordCount = new WordCount();
         if (args == null || args.length == 0) {
             System.out.println("需要参数{-c, -w, -l, -s, -a} [fileName]，请重新输入");
-        } else if (FileUtil.isValidFileName(args[args.length - 1])) {
-            wordCount.count(args[args.length - 1], args);
         } else {
-            System.out.println("需要输入正确的文件名");
+            wordCount.count(args[args.length - 1], args);
         }
     }
 
