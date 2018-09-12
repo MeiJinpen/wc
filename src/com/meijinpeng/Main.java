@@ -14,6 +14,4 @@ public class Main {
             wordCount.count(args[args.length - 1], args);
         }
     }
-
-
 }

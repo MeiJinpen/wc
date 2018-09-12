@@ -29,7 +29,7 @@ public class WordCount {
         if(line.isEmpty()) {
             return 1;
         }
-        return line.length();
+        return line.length() + System.lineSeparator().length();
     }
 
     /**

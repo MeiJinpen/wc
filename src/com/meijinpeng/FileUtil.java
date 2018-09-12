@@ -8,18 +8,6 @@ import java.util.List;
 public class FileUtil {
 
     /**
-     * 匹配正确的文件名
-     * @param fileName 文件名
-     * @return 匹配结果
-     */
-    public static boolean isValidFileName(String fileName) {
-        if (fileName == null || fileName.length() > 255) return false;
-        else {
-            return fileName.matches("[^\\s/:*?\"<>|](\\x20|[^\\s/:*?\"<>|])*[^\\s/:*?\"<>|.]$");
-        }
-    }
-
-    /**
      * 递归查找匹配的文件
      * @param dirName 某个目录下
      * @param fileName 待匹配的文件（可带通配符）
