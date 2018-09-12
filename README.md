@@ -52,11 +52,11 @@
 
 类关系图如下：
 
-![类关系图](images\类图.png)
+![类关系图](https://github.com/MeiJinpen/wc/blob/master/images/类图.png)
 
 主要流程图：
 
-![主要流程图](images\主要流程图.png)
+![主要流程图](https://github.com/MeiJinpen/wc/blob/master/images/主要流程图.png)
 
 ## 代码说明
 
@@ -337,27 +337,27 @@ public class Main {
 
 测试-w , -l -c 功能截图：
 
-![](images\test3.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/test3.png)
 
 测试-a 功能截图：
 
-![](images\test4.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/test4.png)
 
 测试全功能截图：
 
 ![]()
 
-![](images\test1.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/test1.png)
 
-![](images\test2.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/test2.png)
 
 ### 代码覆盖率测试
 
 使用测试-w,-l,-c,-a,-s 测试项目下的所有.java文件，测试代码覆盖率如下：
 
-![](images\cover test1.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/cover test1.png)
 
-![](images\cover test2.png)
+![](https://github.com/MeiJinpen/wc/blob/master/images/cover test2.png)
 
 ## 总结
 
